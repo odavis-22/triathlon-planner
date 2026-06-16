@@ -1,11 +1,18 @@
 import { Session, RaceGoal } from './types'
+import { STRAVA_SESSIONS } from './stravaImport'
 
 const SESSIONS_KEY = 'tricoach_sessions'
 const RACE_KEY = 'tricoach_race'
+const SEEDED_KEY = 'tricoach_seeded'
 
 export function getSessions(): Session[] {
   if (typeof window === 'undefined') return []
   try {
+    // On first load, seed with Strava data
+    if (!localStorage.getItem(SEEDED_KEY)) {
+      localStorage.setItem(SESSIONS_KEY, JSON.stringify(STRAVA_SESSIONS))
+      localStorage.setItem(SEEDED_KEY, 'true')
+    }
     return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]')
   } catch {
     return []
