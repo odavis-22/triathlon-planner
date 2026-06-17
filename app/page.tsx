@@ -90,7 +90,13 @@ export default function Home() {
 
         {/* Right sidebar */}
         <div className="space-y-4">
-          <CoachPanel />
+          <CoachPanel
+                sessions={sessions}
+                onSessionsAdd={(newSessions) => {
+                  newSessions.forEach(saveSession)
+                  setSessions(getSessions())
+                }}
+              />
 
           {/* Upcoming sessions */}
           <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-5">
