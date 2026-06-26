@@ -11,7 +11,7 @@ function sportToDiscipline(sport: string): Discipline {
   }
 }
 
-function effortToIntensity(relativeEffort: number, maxSpeed: number): Intensity {
+function effortToIntensity(relativeEffort: number): Intensity {
   if (relativeEffort >= 40) return 'hard'
   if (relativeEffort >= 15) return 'moderate'
   return 'easy'
@@ -22,6 +22,136 @@ function metersToKm(m: number) {
 }
 
 export const STRAVA_SESSIONS: Session[] = [
+  // June 22
+  {
+    id: 'strava-19026288339',
+    date: '2026-06-22',
+    discipline: 'other',
+    title: 'Afternoon Tennis',
+    duration: Math.round(2182 / 60),
+    intensity: 'easy',
+    completed: true,
+  },
+  {
+    id: 'strava-19024295801',
+    date: '2026-06-22',
+    discipline: 'other',
+    title: 'Lunch Walk',
+    duration: Math.round(3454 / 60),
+    distance: metersToKm(4680.4),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    completed: true,
+  },
+  // June 21
+  {
+    id: 'strava-19012030933',
+    date: '2026-06-21',
+    discipline: 'race',
+    title: 'Last Dance',
+    duration: Math.round(114 / 60),
+    distance: metersToKm(804.7),
+    distanceUnit: 'km',
+    intensity: 'race',
+    notes: 'DMR 9th place 1:54.6 split — What a ride man, loved every minute of it',
+    completed: true,
+  },
+  {
+    id: 'strava-19013947810',
+    date: '2026-06-21',
+    discipline: 'run',
+    title: 'Morning Run',
+    duration: Math.round(550 / 60),
+    distance: metersToKm(1992.7),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    completed: true,
+  },
+  {
+    id: 'strava-19008444934',
+    date: '2026-06-21',
+    discipline: 'run',
+    title: 'Last ride',
+    duration: Math.round(343 / 60),
+    distance: metersToKm(997.6),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    completed: true,
+  },
+  // June 20
+  {
+    id: 'strava-19003975976',
+    date: '2026-06-20',
+    discipline: 'other',
+    title: 'Evening Walk',
+    duration: Math.round(1019 / 60),
+    distance: metersToKm(1163.9),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    completed: true,
+  },
+  // June 19
+  {
+    id: 'strava-18990213969',
+    date: '2026-06-19',
+    discipline: 'run',
+    title: 'Evening Run',
+    duration: Math.round(1008 / 60),
+    distance: metersToKm(3338.3),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    completed: true,
+  },
+  {
+    id: 'strava-18988459202',
+    date: '2026-06-19',
+    discipline: 'run',
+    title: 'Afternoon Run',
+    duration: Math.round(447 / 60),
+    distance: metersToKm(1410),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    completed: true,
+  },
+  {
+    id: 'strava-18996809425',
+    date: '2026-06-19',
+    discipline: 'race',
+    title: 'New balance 4x8',
+    duration: Math.round(121 / 60),
+    distance: metersToKm(804.7),
+    distanceUnit: 'km',
+    intensity: 'race',
+    notes: 'Mentally we are coming back',
+    completed: true,
+  },
+  // June 18
+  {
+    id: 'strava-18972487071',
+    date: '2026-06-18',
+    discipline: 'run',
+    title: 'For the 1 time',
+    duration: Math.round(1367 / 60),
+    distance: metersToKm(4526.1),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    notes: "Let's do it",
+    completed: true,
+  },
+  // June 17
+  {
+    id: 'strava-18963327024',
+    date: '2026-06-17',
+    discipline: 'run',
+    title: '2 out',
+    duration: Math.round(1366 / 60),
+    distance: metersToKm(4846.4),
+    distanceUnit: 'km',
+    intensity: 'moderate',
+    notes: '150 200 200 — 21 28 27',
+    completed: true,
+  },
+  // June 16
   {
     id: 'strava-18949184856',
     date: '2026-06-16',
@@ -31,9 +161,9 @@ export const STRAVA_SESSIONS: Session[] = [
     distance: metersToKm(6569.2),
     distanceUnit: 'km',
     intensity: 'easy',
-    notes: '6.6km easy run',
     completed: true,
   },
+  // June 15
   {
     id: 'strava-18934841407',
     date: '2026-06-15',
@@ -46,6 +176,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: 'Full, 28, 24',
     completed: true,
   },
+  // June 14
   {
     id: 'strava-18923468445',
     date: '2026-06-14',
@@ -55,6 +186,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'easy',
     completed: true,
   },
+  // June 13
   {
     id: 'strava-18903266332',
     date: '2026-06-13',
@@ -67,6 +199,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '28.9, 28.7, 28.2, 28.0 — Feeling great',
     completed: true,
   },
+  // June 12
   {
     id: 'strava-18895773930',
     date: '2026-06-12',
@@ -78,11 +211,23 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'moderate',
     completed: true,
   },
+  // June 11
+  {
+    id: 'strava-18885071376',
+    date: '2026-06-11',
+    discipline: 'run',
+    title: 'Evening Run (cool-down)',
+    duration: Math.round(605 / 60),
+    distance: metersToKm(1344.1),
+    distanceUnit: 'km',
+    intensity: 'easy',
+    completed: true,
+  },
   {
     id: 'strava-18885071385',
     date: '2026-06-11',
     discipline: 'run',
-    title: 'Yeah we\'re fried',
+    title: "Yeah we're fried",
     duration: Math.round(1059 / 60),
     distance: metersToKm(4964.1),
     distanceUnit: 'km',
@@ -101,6 +246,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'easy',
     completed: true,
   },
+  // June 10
   {
     id: 'strava-18872177967',
     date: '2026-06-10',
@@ -125,6 +271,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '200 up · 4x400 1:00 rest · 4x50 off 1:30 · 200 down',
     completed: true,
   },
+  // June 9
   {
     id: 'strava-18858805153',
     date: '2026-06-09',
@@ -137,6 +284,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '5 achievements, 1 PR',
     completed: true,
   },
+  // June 8
   {
     id: 'strava-18837145526',
     date: '2026-06-08',
@@ -148,6 +296,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'easy',
     completed: true,
   },
+  // June 7
   {
     id: 'strava-18825521201',
     date: '2026-06-07',
@@ -156,10 +305,11 @@ export const STRAVA_SESSIONS: Session[] = [
     duration: Math.round(1177 / 60),
     distance: metersToKm(4846.3),
     distanceUnit: 'km',
-    intensity: 'hard',
+    intensity: 'moderate',
     notes: 'First and last 100 all out, middle 100 jog · 1:30 between reps · 5:00 between sets',
     completed: true,
   },
+  // June 6
   {
     id: 'strava-18812316068',
     date: '2026-06-06',
@@ -172,6 +322,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '9 PRs — 218m elevation',
     completed: true,
   },
+  // June 5
   {
     id: 'strava-18801416117',
     date: '2026-06-05',
@@ -203,6 +354,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: 'Push + core',
     completed: true,
   },
+  // June 4
   {
     id: 'strava-18786804582',
     date: '2026-06-04',
@@ -215,6 +367,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '2 PRs',
     completed: true,
   },
+  // June 3
   {
     id: 'strava-18774491779',
     date: '2026-06-03',
@@ -226,6 +379,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'moderate',
     completed: true,
   },
+  // June 2
   {
     id: 'strava-18761269701',
     date: '2026-06-02',
@@ -247,6 +401,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: 'Back biceps + 15 min sauna',
     completed: true,
   },
+  // June 1
   {
     id: 'strava-18747501594',
     date: '2026-06-01',
@@ -269,6 +424,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: 'Push + 15 min sauna',
     completed: true,
   },
+  // May 31
   {
     id: 'strava-18736325534',
     date: '2026-05-31',
@@ -278,6 +434,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'easy',
     completed: true,
   },
+  // May 30
   {
     id: 'strava-18718363577',
     date: '2026-05-30',
@@ -302,6 +459,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '3 PRs',
     completed: true,
   },
+  // May 29
   {
     id: 'strava-18705288905',
     date: '2026-05-29',
@@ -313,6 +471,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'easy',
     completed: true,
   },
+  // May 28
   {
     id: 'strava-18690592492',
     date: '2026-05-28',
@@ -325,6 +484,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '3 achievements · 1 PR',
     completed: true,
   },
+  // May 27
   {
     id: 'strava-18680994765',
     date: '2026-05-27',
@@ -336,6 +496,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'moderate',
     completed: true,
   },
+  // May 26
   {
     id: 'strava-18669358907',
     date: '2026-05-26',
@@ -382,6 +543,7 @@ export const STRAVA_SESSIONS: Session[] = [
     intensity: 'easy',
     completed: true,
   },
+  // May 25
   {
     id: 'strava-18648590794',
     date: '2026-05-25',
@@ -394,6 +556,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '1 PR',
     completed: true,
   },
+  // May 24
   {
     id: 'strava-18640093767',
     date: '2026-05-24',
@@ -406,6 +569,7 @@ export const STRAVA_SESSIONS: Session[] = [
     notes: '5 PRs',
     completed: true,
   },
+  // May 23
   {
     id: 'strava-18635514981',
     date: '2026-05-23',
@@ -425,110 +589,6 @@ export const STRAVA_SESSIONS: Session[] = [
     title: 'Morning Run',
     duration: Math.round(1614 / 60),
     distance: metersToKm(5347),
-    distanceUnit: 'km',
-    intensity: 'easy',
-    completed: true,
-  },
-  {
-    id: 'strava-18611360803',
-    date: '2026-05-22',
-    discipline: 'run',
-    title: 'Lunch Run',
-    duration: Math.round(1305 / 60),
-    distance: metersToKm(4513),
-    distanceUnit: 'km',
-    intensity: 'easy',
-    notes: '1 PR',
-    completed: true,
-  },
-  {
-    id: 'strava-18600089886',
-    date: '2026-05-21',
-    discipline: 'run',
-    title: 'Afternoon Run — 3x2',
-    duration: Math.round(1439 / 60),
-    distance: metersToKm(5295.8),
-    distanceUnit: 'km',
-    intensity: 'hard',
-    notes: '28 28 27',
-    completed: true,
-  },
-  {
-    id: 'strava-18587302617',
-    date: '2026-05-20',
-    discipline: 'run',
-    title: 'Afternoon Run',
-    duration: Math.round(2494 / 60),
-    distance: metersToKm(8096.6),
-    distanceUnit: 'km',
-    intensity: 'easy',
-    notes: '2 achievements',
-    completed: true,
-  },
-  {
-    id: 'strava-18570947386',
-    date: '2026-05-19',
-    discipline: 'other',
-    title: 'Lunch Stand Up Paddling',
-    duration: Math.round(3361 / 60),
-    distance: metersToKm(2920),
-    distanceUnit: 'km',
-    intensity: 'easy',
-    completed: true,
-  },
-  {
-    id: 'strava-18569065933',
-    date: '2026-05-19',
-    discipline: 'run',
-    title: 'Morning Run',
-    duration: Math.round(1827 / 60),
-    distance: metersToKm(5663.9),
-    distanceUnit: 'km',
-    intensity: 'easy',
-    completed: true,
-  },
-  {
-    id: 'strava-18556108040',
-    date: '2026-05-18',
-    discipline: 'run',
-    title: '5x4',
-    duration: Math.round(1271 / 60),
-    distance: metersToKm(5538),
-    distanceUnit: 'km',
-    intensity: 'hard',
-    notes: '68 56 68 56 69 · 4 min rest · 7 PRs',
-    completed: true,
-  },
-  {
-    id: 'strava-18549707907',
-    date: '2026-05-17',
-    discipline: 'other',
-    title: 'Evening Walk',
-    duration: Math.round(4116 / 60),
-    distance: metersToKm(4266.7),
-    distanceUnit: 'km',
-    intensity: 'easy',
-    completed: true,
-  },
-  {
-    id: 'strava-18534151848',
-    date: '2026-05-16',
-    discipline: 'race',
-    title: 'Districts 800 — School Record 🏆',
-    duration: Math.round(114 / 60),
-    distance: metersToKm(804.7),
-    distanceUnit: 'km',
-    intensity: 'race',
-    notes: '1:54.64 — 8th, broke 52-year-old school record. It was all worth it. On top of the world.',
-    completed: true,
-  },
-  {
-    id: 'strava-18534176651',
-    date: '2026-05-16',
-    discipline: 'run',
-    title: 'All worth it (warm-up)',
-    duration: Math.round(1142 / 60),
-    distance: metersToKm(3856.6),
     distanceUnit: 'km',
     intensity: 'easy',
     completed: true,

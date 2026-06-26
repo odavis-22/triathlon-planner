@@ -1,49 +1,112 @@
 import { Session, RaceGoal } from './types'
+import { supabase } from './supabase'
 import { STRAVA_SESSIONS } from './stravaImport'
 
-const SESSIONS_KEY = 'tricoach_sessions'
-const RACE_KEY = 'tricoach_race'
-const SEEDED_KEY = 'tricoach_seeded'
+// ── Sessions ──────────────────────────────────────────────────────────────
 
-export function getSessions(): Session[] {
-  if (typeof window === 'undefined') return []
-  try {
-    // On first load, seed with Strava data
-    if (!localStorage.getItem(SEEDED_KEY)) {
-      localStorage.setItem(SESSIONS_KEY, JSON.stringify(STRAVA_SESSIONS))
-      localStorage.setItem(SEEDED_KEY, 'true')
-    }
-    return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]')
-  } catch {
+export async function getSessions(): Promise<Session[]> {
+  const { data, error } = await supabase
+    .from('sessions')
+    .select('*')
+    .order('date', { ascending: true })
+  if (error) {
+    console.error('getSessions:', error.message)
     return []
   }
+  return data.map(rowToSession)
 }
 
-export function saveSession(session: Session): void {
-  const sessions = getSessions()
-  const idx = sessions.findIndex((s) => s.id === session.id)
-  if (idx >= 0) {
-    sessions[idx] = session
-  } else {
-    sessions.push(session)
-  }
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions))
+export async function saveSession(session: Session): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  const { error } = await supabase
+    .from('sessions')
+    .upsert({ ...sessionToRow(session), user_id: user.id }, { onConflict: 'id' })
+  if (error) console.error('saveSession:', error.message)
 }
 
-export function deleteSession(id: string): void {
-  const sessions = getSessions().filter((s) => s.id !== id)
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions))
+export async function deleteSession(id: string): Promise<void> {
+  const { error } = await supabase.from('sessions').delete().eq('id', id)
+  if (error) console.error('deleteSession:', error.message)
 }
 
-export function getRaceGoal(): RaceGoal | null {
-  if (typeof window === 'undefined') return null
-  try {
-    return JSON.parse(localStorage.getItem(RACE_KEY) || 'null')
-  } catch {
+// ── Strava Sync ───────────────────────────────────────────────────────────
+
+export async function syncStravaActivities(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 0
+
+  // Find which strava IDs are already in the DB
+  const { data: existing } = await supabase
+    .from('sessions')
+    .select('id')
+    .like('id', 'strava-%')
+
+  const existingIds = new Set((existing ?? []).map((r: { id: string }) => r.id))
+  const newSessions = STRAVA_SESSIONS.filter((s) => !existingIds.has(s.id))
+
+  if (newSessions.length === 0) return 0
+
+  const rows = newSessions.map((s) => ({ ...sessionToRow(s), user_id: user.id }))
+  const { error } = await supabase.from('sessions').insert(rows)
+  if (error) console.error('syncStravaActivities:', error.message)
+
+  return newSessions.length
+}
+
+// ── Race Goal ─────────────────────────────────────────────────────────────
+
+export async function getRaceGoal(): Promise<RaceGoal | null> {
+  const { data, error } = await supabase
+    .from('race_goals')
+    .select('*')
+    .maybeSingle()
+  if (error) {
+    console.error('getRaceGoal:', error.message)
     return null
   }
+  if (!data) return null
+  return { date: data.date, name: data.name, type: data.type }
 }
 
-export function saveRaceGoal(goal: RaceGoal): void {
-  localStorage.setItem(RACE_KEY, JSON.stringify(goal))
+export async function saveRaceGoal(goal: RaceGoal): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  const { error } = await supabase.from('race_goals').upsert(
+    { user_id: user.id, date: goal.date, name: goal.name, type: goal.type, updated_at: new Date().toISOString() },
+    { onConflict: 'user_id' }
+  )
+  if (error) console.error('saveRaceGoal:', error.message)
+}
+
+// ── Row mapping ───────────────────────────────────────────────────────────
+
+function rowToSession(row: Record<string, unknown>): Session {
+  return {
+    id: row.id as string,
+    date: row.date as string,
+    discipline: row.discipline as Session['discipline'],
+    title: row.title as string,
+    duration: row.duration as number,
+    distance: row.distance as number | undefined,
+    distanceUnit: row.distance_unit as Session['distanceUnit'],
+    intensity: row.intensity as Session['intensity'],
+    notes: row.notes as string | undefined,
+    completed: row.completed as boolean,
+  }
+}
+
+function sessionToRow(s: Session) {
+  return {
+    id: s.id,
+    date: s.date,
+    discipline: s.discipline,
+    title: s.title,
+    duration: s.duration,
+    distance: s.distance ?? null,
+    distance_unit: s.distanceUnit ?? null,
+    intensity: s.intensity,
+    notes: s.notes ?? null,
+    completed: s.completed,
+  }
 }

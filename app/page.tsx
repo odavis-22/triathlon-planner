@@ -1,8 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Session, RaceGoal } from '@/lib/types'
 import { getSessions, saveSession, deleteSession, getRaceGoal, saveRaceGoal } from '@/lib/storage'
+import { supabase } from '@/lib/supabase'
+import { stravaAuthUrl } from '@/lib/strava'
 import { DISCIPLINES } from '@/lib/disciplines'
 import Calendar from '@/components/Calendar'
 import SessionModal from '@/components/SessionModal'
@@ -10,20 +13,59 @@ import RaceModal from '@/components/RaceModal'
 import RaceCountdown from '@/components/RaceCountdown'
 import WeeklyStats from '@/components/WeeklyStats'
 import CoachPanel from '@/components/CoachPanel'
-import { Trophy } from 'lucide-react'
+import { Trophy, LogOut } from 'lucide-react'
 
 export default function Home() {
+  const router = useRouter()
   const [sessions, setSessions] = useState<Session[]>([])
   const [race, setRace] = useState<RaceGoal | null>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [editingSession, setEditingSession] = useState<Session | null>(null)
   const [showSessionModal, setShowSessionModal] = useState(false)
   const [showRaceModal, setShowRaceModal] = useState(false)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [stravaConnected, setStravaConnected] = useState<boolean | null>(null)
+
+  async function refreshSessions() {
+    setSessions(await getSessions())
+  }
 
   useEffect(() => {
-    setSessions(getSessions())
-    setRace(getRaceGoal())
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) { router.replace('/login'); return }
+      setUserEmail(user.email ?? null)
+      setUserId(user.id)
+      getRaceGoal().then(setRace)
+
+      // Check Strava connection status
+      const res = await fetch(`/api/strava/status?userId=${user.id}`)
+      const { connected } = await res.json()
+      setStravaConnected(connected)
+
+      if (connected) {
+        // Auto-sync new activities on every login
+        await fetch('/api/strava/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id }),
+        })
+      }
+
+      refreshSessions()
+    })
+
+    // Show success message if coming back from Strava OAuth
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('strava') === 'connected') {
+      window.history.replaceState({}, '', '/')
+    }
   }, [])
+
+  async function handleSignOut() {
+    await supabase.auth.signOut()
+    router.replace('/login')
+  }
 
   function handleDayClick(date: string) {
     setSelectedDate(date)
@@ -37,18 +79,18 @@ export default function Home() {
     setShowSessionModal(true)
   }
 
-  function handleSaveSession(session: Session) {
-    saveSession(session)
-    setSessions(getSessions())
+  async function handleSaveSession(session: Session) {
+    await saveSession(session)
+    await refreshSessions()
   }
 
-  function handleDeleteSession(id: string) {
-    deleteSession(id)
-    setSessions(getSessions())
+  async function handleDeleteSession(id: string) {
+    await deleteSession(id)
+    await refreshSessions()
   }
 
-  function handleSaveRace(goal: RaceGoal) {
-    saveRaceGoal(goal)
+  async function handleSaveRace(goal: RaceGoal) {
+    await saveRaceGoal(goal)
     setRace(goal)
   }
 
@@ -72,7 +114,36 @@ export default function Home() {
               <p className="text-xs text-slate-500">Triathlon Training Planner</p>
             </div>
           </div>
-          <RaceCountdown race={race} onSetRace={() => setShowRaceModal(true)} />
+          <div className="flex items-center gap-3">
+            <RaceCountdown race={race} onSetRace={() => setShowRaceModal(true)} />
+
+            {stravaConnected === false && userId && (
+              <a
+                href={stravaAuthUrl(userId)}
+                className="flex items-center gap-2 bg-[#FC4C02] hover:bg-[#e04400] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+                </svg>
+                Connect Strava
+              </a>
+            )}
+            {stravaConnected === true && (
+              <span className="flex items-center gap-1.5 text-xs text-[#FC4C02] font-medium">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+                </svg>
+                Strava connected
+              </span>
+            )}
+
+            <div className="flex items-center gap-3 border-l border-slate-700 pl-3">
+              {userEmail && <span className="text-xs text-slate-500 hidden sm:block">{userEmail}</span>}
+              <button onClick={handleSignOut} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors">
+                <LogOut size={14} /> Sign out
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -91,12 +162,12 @@ export default function Home() {
         {/* Right sidebar */}
         <div className="space-y-4">
           <CoachPanel
-                sessions={sessions}
-                onSessionsAdd={(newSessions) => {
-                  newSessions.forEach(saveSession)
-                  setSessions(getSessions())
-                }}
-              />
+            sessions={sessions}
+            onSessionsAdd={async (newSessions) => {
+              await Promise.all(newSessions.map(saveSession))
+              await refreshSessions()
+            }}
+          />
 
           {/* Upcoming sessions */}
           <div className="bg-slate-800/40 border border-slate-700 rounded-2xl p-5">
